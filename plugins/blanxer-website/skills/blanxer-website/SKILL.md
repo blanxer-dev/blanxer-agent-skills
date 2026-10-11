@@ -70,12 +70,11 @@ npx blanxer-storefront check            # add --lighthouse http://localhost:3000
 It must pass: required routes, no secrets, no login code, browser-only order/payment calls, image budget (no file in `public/` over 300 KB or wider than 2560 px, no JPEG/PNG where AVIF/WebP fits, every image `next/image` with a size), Lighthouse mobile ≥ 90 with LCP < 2.5 s on home, a product page and checkout. Fix failures before deploying, or tell the merchant why one can't be fixed.
 
 ### 6. Test checkout
-Use the phone number `0000000000`: the API answers success without creating an order, so the whole path can be exercised safely. On the local production build:
-- a Cash on Delivery order reaches `/track/...` or the success state;
-- each enabled online method opens its gateway page or QR screen (don't pay);
-- `/payment/success`, `/payment/failed` and `/track/<id>` render;
-- leaving a QR screen open shows the timer, and closing it asks first.
-Details: `references/checkout.md`.
+On the local production build:
+- Fill the checkout with phone `0000000000`: the API answers success **without creating an order** and the checkout shows "Test order accepted". This proves the form, delivery charge, coupon and order request work. (Because no order exists, no gateway or QR screen opens on this path.)
+- Check every enabled payment method appears for a COD and a non-COD place as expected (rules in `references/checkout.md`).
+- Open `/payment/success`, `/payment/failed` and `/track/<any order id>` directly: they must render.
+- The gateway and QR screens themselves are checked once, live, in step 12.
 
 ### 7. Cloudflare sign-in
 ```bash
@@ -103,7 +102,8 @@ Add the domain to the merchant's Cloudflare account and attach it to the Worker 
 
 ### 12. Live check and hand-over
 - On the live site: home, a product, checkout, `/payment/success`, `/payment/failed`, and `/track/<a real order id>`.
-- Place one COD order on the real store (with the merchant's OK and their phone number), then cancel it in the Blanxer dashboard.
+- With the merchant's OK and their own phone number, place one COD order on the real store, then cancel it in the Blanxer dashboard.
+- For one online method the store uses, start a real order and open the gateway or QR screen, then stop without paying (close the QR screen, which releases the stock hold) and cancel the order in the dashboard.
 - Leave a short `README.md` in the project: how to run it locally, change the design, and redeploy (`opennextjs-cloudflare build && opennextjs-cloudflare deploy`).
 
 ## When something goes wrong

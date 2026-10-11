@@ -44,6 +44,9 @@ The starter has all three, built from `PaymentSuccess`, `PaymentFailed` and `Ord
 
 ## Safe testing
 
-- **Phone `0000000000`:** the API answers success but creates no order. Use it for every test before going live.
-- **Online methods:** open the gateway page or QR screen to check the flow, then leave without paying.
-- **Live check:** one real COD order with the merchant's OK, cancelled afterwards in the dashboard.
+- **Phone `0000000000`:** the API answers success but creates no order, and the checkout shows "Test order accepted". Use it to test the form, delivery charge, coupons and the order request. No gateway or QR screen opens on this path, because there is no order to pay for.
+- **Payment screens:** check them once, live, with the merchant's OK:
+  1. Place a real order on one online method.
+  2. Open the gateway or QR screen and stop without paying. Closing the QR screen releases the stock hold.
+  3. Cancel the order in the dashboard.
+- **Live COD check:** one real COD order with the merchant's own phone number, cancelled afterwards.
