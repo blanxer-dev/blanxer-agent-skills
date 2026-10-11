@@ -1,0 +1,15 @@
+{
+  "name": "blanxer",
+  "description": "Blanxer plugins for AI agents: build and run your Blanxer store's own website.",
+  "owner": {
+    "name": "Blanxer",
+    "email": "support@blanxer.com"
+  },
+  "plugins": [
+    {
+      "name": "blanxer-website",
+      "source": "./plugins/blanxer-website",
+      "description": "Build a Next.js website for a Blanxer store and deploy it to the merchant's own Cloudflare account. Blanxer stays the admin; the checkout works exactly like Blanxer's."
+    }
+  ]
+}

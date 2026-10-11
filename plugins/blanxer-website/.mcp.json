@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "blanxer": {
+      "type": "http",
+      "url": "https://mcp.blanxer.com/mcp"
+    }
+  }
+}

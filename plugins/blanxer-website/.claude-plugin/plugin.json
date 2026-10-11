@@ -1,0 +1,11 @@
+{
+  "name": "blanxer-website",
+  "version": "0.1.0",
+  "description": "Build a Next.js website for a Blanxer store on BlanxerAPI and deploy it to the merchant's own Cloudflare account.",
+  "author": {
+    "name": "Blanxer",
+    "url": "https://blanxer.com"
+  },
+  "homepage": "https://developers.blanxer.com",
+  "keywords": ["blanxer", "nextjs", "cloudflare", "ecommerce", "nepal"]
+}
