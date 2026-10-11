@@ -30,7 +30,7 @@ The full docs are at https://developers.blanxer.com (agent index: https://develo
 9. **Payment methods come from the store's settings** via the package. Never add or remove them by hand.
 10. **Use Blanxer's URL paths**: `/product/[slug]`, `/collections/[slug]`, `/brand/[slug]`, `/blogs`, `/blog/[slug]`, `/forms/[slug]`. The feed, sitemap, SMS and emails use them. **Don't build a product feed or catalog sitemap**: Blanxer serves both for the site's domain. Keep the starter's `/sitemap-catalog.xml` pass-through and `/sitemap.xml` index; only add the site's own extra pages to the index.
 11. **Optimise every image before it goes into the site** (see `references/images.md`): `npx blanxer-storefront images`, AVIF + WebP, ×2 the largest display size, metadata stripped, `next/image` with width/height, `priority` only on each page's first big image. **Product photos go into Blanxer through the MCP, never into the site.** No autoplay video backgrounds or GIF banners unless the merchant insists after hearing the speed cost. Fonts through `next/font`, at most 2 families.
-12. **The site's design lives in the site.** Don't use MCP page-builder or section tools (`blanxer_add_section`, `blanxer_update_section`, `blanxer_apply_page_template`, navigation/footer editors) to design a custom site; they change the Blanxer-hosted site.
+12. **The site's design lives in the site.** Don't use MCP page-builder or section tools (`blanxer_add_section`, `blanxer_update_section`, `blanxer_apply_page_template`, navigation/footer editors) to design a custom site; they change the Blanxer-hosted site. Exception: blog post bodies. `blanxer_create_blog_post` makes an empty post, and its body is written with `blanxer_add_section` / `blanxer_update_section` using `{ post_id }`. That is content the site shows, so use them for blog posts.
 13. **Confirm before bulk store changes.** Show the merchant the list (SEO for many products, imports, delivery charges) and get a yes. The MCP's own confirmations still apply.
 
 ## Steps (confirm each with the merchant before moving on)
@@ -90,7 +90,7 @@ Check the build size first: the Workers free plan allows a 3 MiB (compressed) wo
 Print the live `*.workers.dev` link and open it.
 
 ### 9. Link the site to Blanxer
-- Save the link with `blanxer_set_storefront_url { url: "https://..." }` (or the merchant pastes it in Blanxer → avatar menu → **BlanxerAPI** → Your website). From then on SMS tracking links, the delivered email, flash-sale alerts, the product feed and the sitemap use the new site.
+- Save the link with `blanxer_set_storefront_url { url: "https://..." }`. The first call is a preview that returns a `confirm_token`. Show it to the merchant, and after their yes call again with `{ dry_run: false, confirm_token }` (or the merchant pastes it in Blanxer → avatar menu → **BlanxerAPI** → Your website). From then on SMS tracking links, the delivered email, flash-sale alerts, the product feed and the sitemap use the new site.
 - Register the product feed URL (`https://api.blanxer.com/public/product-feed/<store_id>.xml`) in Meta Commerce Manager / Google Merchant Center.
 - Submit `https://<site>/sitemap.xml` in Google Search Console; verify ownership with `blanxer_set_site_verification` (the site renders the tag).
 

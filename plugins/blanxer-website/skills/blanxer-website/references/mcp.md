@@ -13,21 +13,23 @@ The merchant signs in to Blanxer in the browser. You never see a key.
 | Check SEO gaps | `blanxer_audit_seo` | — |
 | Write product titles and descriptions for search | `blanxer_update_product_status_seo`, `blanxer_bulk_update_products` | product SEO fields → page metadata |
 | Write category and brand SEO | `blanxer_bulk_update_categories_seo`, `blanxer_update_category`, `blanxer_update_brand` | `check_domain.categories`, brand details |
-| Verify Google Search Console, add GA/GTM | `blanxer_set_site_verification` | store plugins → `verificationMetadata` |
+| Verify Google Search Console, add GA/GTM | `blanxer_set_site_verification` | store plugins → `verificationMetadata` (meta tags) and `<Pixel>` (GA, GTM, Clarity, Meta Pixel) |
 | Add products the merchant describes or sends photos of | `blanxer_create_product`, `blanxer_bulk_create_products`, `blanxer_bulk_import_products`, `blanxer_upload_product_image`, `blanxer_request_image_upload` | product endpoints |
 | Create categories and brands for the menus | `blanxer_create_category`, `blanxer_create_brand`, `blanxer_reorder_categories` | categories / brands |
 | Set up launch coupons | `blanxer_create_coupon` | coupons |
 | Fix delivery places, charges and COD | `blanxer_get_delivery_charges`, `blanxer_update_delivery_charges` | delivery table |
 | Change name, logo, favicon or colours (shared with the Blanxer site) | `blanxer_update_store_profile`, `blanxer_update_appearance` | `check_domain.customization` |
-| Write blog posts | `blanxer_create_blog_post`, `blanxer_set_blog_post_status` | blog |
-| **Save the website link** | `blanxer_set_storefront_url` | — |
-| Get the feed and sitemap links | `blanxer_get_store_context` | — |
+| Write blog posts | `blanxer_create_blog_post` (empty post), then its body with `blanxer_add_section` / `blanxer_update_section` using `{ post_id }`, then `blanxer_set_blog_post_status` | blog |
+| **Save the website link** | `blanxer_set_storefront_url { url }` → preview with `confirm_token` → after the merchant's yes `{ dry_run: false, confirm_token }`. A bare `mystore.com` becomes `https://mystore.com`; `*.blanxer.io` addresses are refused | — |
+| Get the feed and sitemap links | `blanxer_get_store_context` (only once a website link is saved) | — |
 | Retire the old subdomain site | `blanxer_update_appearance { store_visibility: 'hidden_on_subdomain' }` | — |
 
-Don't use these on a custom site, because they change the Blanxer-hosted site:
-- `blanxer_add_section`
-- `blanxer_update_section`
-- `blanxer_apply_page_template`
-- navigation and footer editors
+Don't use these to design a custom site, because they change the Blanxer-hosted site:
+- page tools (create, update, duplicate and delete page);
+- `blanxer_add_section` and `blanxer_update_section` (except with `{ post_id }` for blog post bodies);
+- `blanxer_apply_page_template`;
+- navigation and footer editors.
+
+For the whole flow, `blanxer_how_to { operation: 'custom_website' }`.
 
 Confirm before bulk changes (rule 13).
