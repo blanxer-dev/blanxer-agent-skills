@@ -112,7 +112,7 @@ Add the domain to the merchant's Cloudflare account and attach it to the Worker 
 - "Place not found" / COD refused → the delivery place must be one of the store's places exactly; COD only where that place allows it.
 - Coupon refused at order time → the order must carry the coupon's `_id`, not its code (the package does this).
 - `403 error code: 1010` from the API on server-side fetches → make sure the package's fetch (with its User-Agent) is used; report it to Blanxer support.
-- More: https://developers.blanxer.com/troubleshooting.md
+- More: https://developers.blanxer.com/api-docs/troubleshooting.md
 
 ## References
 - `references/checkout.md` — payment method rules, the three required pages, test numbers
