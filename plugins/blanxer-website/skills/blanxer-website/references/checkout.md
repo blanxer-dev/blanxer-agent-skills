@@ -27,7 +27,7 @@ Never add, hide or rename these by hand (rule 9). A method the merchant turns on
 |---|---|
 | `/payment/success` | eSewa, Khalti, Fonepay, NPX and Nabil return here after a successful payment (through api.blanxer.com) |
 | `/payment/failed` | the same gateways return here after a failed or cancelled payment |
-| `/track/[id]` | COD and paid QR orders land here; the order email and SMS link here |
+| `/track/[id]` | COD and paid QR orders land here; order emails and the dashboard's tracking link point here |
 
 The starter has all three, built from `PaymentSuccess`, `PaymentFailed` and `OrderTracking`. Restyle them; don't move or delete them.
 

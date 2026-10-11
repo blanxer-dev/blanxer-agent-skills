@@ -44,7 +44,7 @@ The output ends with the live `https://<name>.<account>.workers.dev` link. Open 
    - `blanxer_set_storefront_url { url: "https://<live link or custom domain>" }`, or
    - the merchant opens Blanxer → avatar menu → BlanxerAPI → Your website.
 
-   Blanxer then uses this link in SMS tracking links, the delivered email, flash-sale alerts, the product feed and the sitemap.
+   Blanxer then uses this link for the tracking link shown in the dashboard, order and delivered emails, flash-sale alerts, the product feed and the sitemap. SMS messages use `bxr.sh` short links; whether those follow the new site is not yet confirmed.
 2. Register the product feed (`https://api.blanxer.com/public/product-feed/<store_id>.xml`) in Meta Commerce Manager and/or Google Merchant Center.
 3. Submit `https://<site>/sitemap.xml` in Google Search Console, and verify ownership with `blanxer_set_site_verification`.
 
