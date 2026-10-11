@@ -25,7 +25,7 @@ npx blanxer-storefront images ./incoming ./public/images --max-width 2560
 ## Loading
 
 - Use `next/image` everywhere, with `width` and `height` (or `fill` with a sized parent) and correct `sizes`.
-- The first big image of each page (the LCP image) gets `priority`. Everything else loads lazily (the default).
+- The main image of each page (the largest one in the first screen, the LCP image) gets `preload`; Next.js 16 replaced `priority` with it (`loading="eager"` + `fetchPriority="high"` also work). Everything else loads lazily (the default).
 - No CSS background images for main content. No autoplay video backgrounds or GIF banners unless the merchant insists after hearing the speed cost.
 
 ## Product photos
@@ -42,6 +42,9 @@ npx blanxer-storefront images ./incoming ./public/images --max-width 2560
 It fails on:
 - any file in `public/` over 300 KB or wider than 2560 px;
 - JPEG/PNG where AVIF/WebP should be used;
-- a raw `<img>` instead of `next/image`.
+- a raw `<img>` instead of `next/image`;
+- an `<Image>` without `width`/`height` or `fill`.
+
+It warns when no image is marked as the page's main image.
 
 `--lighthouse <url>` adds the speed check against a running production build.

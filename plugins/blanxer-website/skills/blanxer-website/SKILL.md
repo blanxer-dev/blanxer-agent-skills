@@ -29,7 +29,7 @@ The full docs are at https://developers.blanxer.com (agent index: https://develo
 8. **Don't invent data.** Prices, stock, delivery charges and payment methods come only from the API. No sample products or placeholder prices in the deployed site.
 9. **Payment methods come from the store's settings** via the package. Never add or remove them by hand.
 10. **Use Blanxer's URL paths**: `/product/[slug]`, `/collections/[slug]`, `/brand/[slug]`, `/blogs`, `/blog/[slug]`, `/forms/[slug]`. The feed, sitemap, SMS and emails use them. **Don't build a product feed or catalog sitemap**: Blanxer serves both for the site's domain. Keep the starter's `/sitemap-catalog.xml` pass-through and `/sitemap.xml` index; only add the site's own extra pages to the index.
-11. **Optimise every image before it goes into the site** (see `references/images.md`): `npx blanxer-storefront images`, AVIF + WebP, ×2 the largest display size, metadata stripped, `next/image` with width/height, `priority` only on each page's first big image. **Product photos go into Blanxer through the MCP, never into the site.** No autoplay video backgrounds or GIF banners unless the merchant insists after hearing the speed cost. Fonts through `next/font`, at most 2 families.
+11. **Optimise every image before it goes into the site** (see `references/images.md`): `npx blanxer-storefront images`, AVIF + WebP, ×2 the largest display size, metadata stripped, `next/image` with width/height, `preload` only on each page's main (largest, first) image (Next.js 16 replaced `priority` with `preload`). **Product photos go into Blanxer through the MCP, never into the site.** No autoplay video backgrounds or GIF banners unless the merchant insists after hearing the speed cost. Fonts through `next/font`, at most 2 families.
 12. **The site's design lives in the site.** Don't use MCP page-builder or section tools (`blanxer_add_section`, `blanxer_update_section`, `blanxer_apply_page_template`, navigation/footer editors) to design a custom site; they change the Blanxer-hosted site. Exception: blog post bodies. `blanxer_create_blog_post` makes an empty post, and its body is written with `blanxer_add_section` / `blanxer_update_section` using `{ post_id }`. That is content the site shows, so use them for blog posts.
 13. **Confirm before bulk store changes.** Show the merchant the list (SEO for many products, imports, delivery charges) and get a yes. The MCP's own confirmations still apply.
 
@@ -50,7 +50,7 @@ Ask for reference sites, look and feel, pages, tone, and must-haves. Offer the s
 ```bash
 npx degit blanxer-dev/blanxer-storefront-starter <folder>
 cd <folder>
-cp .env.example .env    # set BLANXER_STORE=<subdomain>
+cp .env.example .env    # set BLANXER_STORE=<subdomain>; optional SITE_URL once the domain is known
 npm install
 ./node_modules/.bin/next dev
 ```
@@ -65,9 +65,9 @@ Show the merchant the starter running with their real products before changing t
 ### 5. Check before deploy
 ```bash
 ./node_modules/.bin/next build
-npx blanxer-storefront check            # add --lighthouse http://localhost:3000 with the production build running
+npx blanxer-storefront check            # with ./node_modules/.bin/next start running: add --lighthouse http://localhost:3000
 ```
-It must pass: required routes, no secrets, no login code, browser-only order/payment calls, image budget (no file in `public/` over 300 KB or wider than 2560 px, no JPEG/PNG where AVIF/WebP fits, every image `next/image` with a size), Lighthouse mobile ≥ 90 with LCP < 2.5 s on home, a product page and checkout. Fix failures before deploying, or tell the merchant why one can't be fixed.
+It must pass: required routes, no secrets, no login code, browser-only order/payment calls, image budget (no file in `public/` over 300 KB or wider than 2560 px, no JPEG/PNG where AVIF/WebP fits, every image `next/image` with a size, a `preload` main image), Lighthouse mobile ≥ 90 with LCP < 2.5 s on home, a product page and checkout. Fix failures before deploying, or tell the merchant why one can't be fixed.
 
 ### 6. Test checkout
 On the local production build:
@@ -84,6 +84,7 @@ The browser opens and **the merchant signs in to their own Cloudflare account** 
 Check the build size first: the Workers free plan allows a 3 MiB (compressed) worker. If it's bigger, say so before deploying and offer trimming or the $5/month Workers paid plan. See `references/deploy.md`.
 
 ### 8. Deploy
+First rename the worker: in `wrangler.jsonc` change `"name": "blanxer-storefront"` to the site's name (e.g. `mystore-site`) and the `WORKER_SELF_REFERENCE` service to match. `.env` is copied into the Worker, so `BLANXER_STORE` must be set there.
 ```bash
 ./node_modules/.bin/opennextjs-cloudflare build && ./node_modules/.bin/opennextjs-cloudflare deploy
 ```

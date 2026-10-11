@@ -26,6 +26,12 @@ npx wrangler login
 
 ## Deploy
 
+Before the first deploy:
+- in `wrangler.jsonc`, rename `"name": "blanxer-storefront"` to the site's name and the `WORKER_SELF_REFERENCE` service to match;
+- make sure `.env` has `BLANXER_STORE` (OpenNext copies `.env` into the Worker).
+
+The starter keeps no Cloudflare cache storage, so a first deploy needs no extra setup. Pages render per request, and the package caches API reads for 60 s per Worker. An R2 incremental cache is commented in `open-next.config.ts` and `wrangler.jsonc` if a busy store needs it.
+
 ```bash
 ./node_modules/.bin/opennextjs-cloudflare build && ./node_modules/.bin/opennextjs-cloudflare deploy
 ```
