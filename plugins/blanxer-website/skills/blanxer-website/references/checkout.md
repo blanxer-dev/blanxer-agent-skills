@@ -1,6 +1,6 @@
 # Checkout: what the package does and what you must keep
 
-Use `Checkout` from `@blanxer/storefront/react` on `/checkout`. It reproduces Blanxer's own checkout. Under the place-order button it shows **"Checkout Powered by Blanxer"** (linking to blanxer.com). Restyle it with the `.bx-powered-by` class; never remove or hide it. Full spec: https://developers.blanxer.com/checkout.md
+Use `Checkout` from `@blanxer-dev/storefront/react` on `/checkout`. It reproduces Blanxer's own checkout. Under the place-order button it shows **"Checkout Powered by Blanxer"** (linking to blanxer.com). Restyle it with the `.bx-powered-by` class; never remove or hide it. Full spec: https://developers.blanxer.com/checkout.md
 
 ## Payment methods the site shows
 
