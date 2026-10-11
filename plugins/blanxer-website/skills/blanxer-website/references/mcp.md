@@ -18,7 +18,8 @@ The merchant signs in to Blanxer in the browser. You never see a key.
 | Create categories and brands for the menus | `blanxer_create_category`, `blanxer_create_brand`, `blanxer_reorder_categories` | categories / brands |
 | Set up launch coupons | `blanxer_create_coupon` | coupons |
 | Fix delivery places, charges and COD | `blanxer_get_delivery_charges`, `blanxer_update_delivery_charges` | delivery table |
-| Change name, logo, favicon or colours (shared with the Blanxer site) | `blanxer_update_store_profile`, `blanxer_update_appearance` | `check_domain.customization` |
+| Change the store name or description (shared with the Blanxer site) | `blanxer_update_store_profile` | `check_domain.name`, `description` |
+| Change logo, favicon, brand name or colours (shared with the Blanxer site) | `blanxer_update_appearance` | `check_domain.customization` |
 | Write blog posts | `blanxer_create_blog_post` (empty post), then its body with `blanxer_add_section` / `blanxer_update_section` using `{ post_id }`, then `blanxer_set_blog_post_status` | blog |
 | **Save the website link** | `blanxer_set_storefront_url { url }` → preview with `confirm_token` → after the merchant's yes `{ dry_run: false, confirm_token }`. A bare `mystore.com` becomes `https://mystore.com`; `*.blanxer.io` addresses are refused | — |
 | Get the feed and sitemap links | `blanxer_get_store_context` (only once a website link is saved) | — |
