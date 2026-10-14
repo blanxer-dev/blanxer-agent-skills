@@ -8,6 +8,8 @@ How to connect:
 
 The merchant signs in to Blanxer in the browser. You never see a key.
 
+**Connect it first, before any other work.** Claude Code only loads a newly added MCP server when it starts. If you have to add it, ask the merchant to restart right away: type `/exit`, then run `claude -c` from the same folder Claude Code was started in. That reopens this conversation with its history; a plain `claude` would start an empty one. Signing in to an already-added server through `/mcp` needs no restart.
+
 | While building the site you… | MCP tool | The site reads it from |
 |---|---|---|
 | Check SEO gaps | `blanxer_audit_seo` | — |
