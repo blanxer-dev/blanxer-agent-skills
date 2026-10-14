@@ -13,7 +13,7 @@ The `blanxer-website` plugin brings:
 - the **blanxer-website** skill (step-by-step: find the store, design, scaffold from the starter, check, deploy to the merchant's Cloudflare account, link back to Blanxer);
 - the **Blanxer MCP** server (`https://mcp.blanxer.com/mcp`, sign in to Blanxer in the browser) so the agent can fix SEO, products and other store data while it builds.
 
-Then tell Claude: *"Build my Blanxer store website. My store is `<subdomain>`."*
+Then tell Claude: *"Build my Blanxer store website. My store is `<subdomain>.blanxer.io`."*
 
 ## Other agents (Cursor, Codex, …)
 
