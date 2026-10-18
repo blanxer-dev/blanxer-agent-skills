@@ -1,6 +1,6 @@
 ---
 name: blanxer-website
-description: Build a custom Next.js website for a Blanxer store (BlanxerAPI) and deploy it to the merchant's own Cloudflare account, with Blanxer as the admin and Blanxer's exact checkout (payments, delivery charges, coupons, stock holds, order tracking). Use whenever someone wants a website, storefront, shop site or landing site for their Blanxer store, mentions BlanxerAPI, developers.blanxer.com, a Blanxer subdomain (*.blanxer.io), or asks to redesign, rebuild, redeploy or move their Blanxer shop to their own domain. Also use to change, fix or redeploy a site built this way.
+description: Build a custom Next.js website for a Blanxer store (BlanxerAPI) and deploy it to the merchant's own Cloudflare account, with Blanxer as the admin and Blanxer's exact checkout (payments, delivery charges, offers and discount codes, stock holds, order tracking). Use whenever someone wants a website, storefront, shop site or landing site for their Blanxer store, mentions BlanxerAPI, developers.blanxer.com, a Blanxer subdomain (*.blanxer.io), or asks to redesign, rebuild, redeploy or move their Blanxer shop to their own domain. Also use to change, fix or redeploy a site built this way.
 ---
 
 # Build a Blanxer store website
@@ -11,8 +11,8 @@ Three channels, each with one job:
 
 | Channel | Who | What for |
 |---|---|---|
-| Public API `https://api.blanxer.com` (no key) | the **site's code** | read store, catalog, delivery table; place orders and payments from the browser |
-| Blanxer MCP `https://mcp.blanxer.com/mcp` (OAuth) | **you**, in this chat | change the store: SEO text, products, photos, categories, coupons, delivery, the website link |
+| Public API `https://api.blanxer.com` (no key) | the **site's code** | read store, catalog, delivery table, offers; price the cart (offers quote), place orders and payments from the browser |
+| Blanxer MCP `https://mcp.blanxer.com/mcp` (OAuth) | **you**, in this chat | change the store: SEO text, products, photos, categories, offers and codes, delivery, the website link |
 | Blanxer-served XML | Google / Meta | product feed and catalog sitemap, built by Blanxer for the site's domain |
 
 The full docs are at https://developers.blanxer.com (agent index: https://developers.blanxer.com/llms.txt). Fetch a page when a step below points to it.
@@ -23,7 +23,7 @@ The full docs are at https://developers.blanxer.com (agent index: https://develo
 2. **Start from the starter and keep `@blanxer-dev/storefront`.** Restyle the checkout through its theme props, CSS variables and wrappers. **Never rewrite** the payment, delivery, coupon or order logic, and never call payment endpoints yourself. The checkout's **"Checkout Powered by Blanxer"** line is part of it: restyle it through `.bx-powered-by`, never remove or hide it. Keep the root layout's metadata from `storeMetadata`: its `generator: Blanxer Storefront` and `blanxer-store` tags are how Blanxer confirms the saved website link is this store's site.
 3. **Required routes, exact paths:** `/checkout`, `/payment/success`, `/payment/failed`, `/track/[id]`. Payment gateways send the shopper back to the last three; missing ones mean a 404 **after paying**.
 4. **The site sends its own origin as `url`** on orders and payments. The package does it; never hardcode a domain.
-5. **Orders, coupons, payment starts, hold release, back-in-stock, forms, cancel and review run in the browser** (client components via `@blanxer-dev/storefront/client` or `/react`). Never from server components, route handlers or server actions: they are rate-limited per shopper IP.
+5. **Orders, coupons, the offers cart quote, payment starts, hold release, back-in-stock, forms, cancel and review run in the browser** (client components via `@blanxer-dev/storefront/client` or `/react`). Never from server components, route handlers or server actions: they are rate-limited per shopper IP.
 6. **No secrets in the site.** It needs no key. Never put an `sk_` API key, MCP token, dashboard login or gateway key in code, `.env` or the build. Never ask the merchant to paste a key. Store changes go through the Blanxer MCP.
 7. **No customer login.** Don't call `/customer/auth/*` or build account, login, wishlist or rewards pages. Custom sites use guest checkout.
 8. **Don't invent data.** Prices, stock, delivery charges and payment methods come only from the API. No sample products or placeholder prices in the deployed site.
@@ -31,7 +31,8 @@ The full docs are at https://developers.blanxer.com (agent index: https://develo
 10. **Use Blanxer's URL paths**: `/product/[slug]`, `/collections/[slug]`, `/brand/[slug]`, `/blogs`, `/blog/[slug]`, `/forms/[slug]`. The feed, sitemap, SMS and emails use them. **Don't build a product feed or catalog sitemap**: Blanxer serves both for the site's domain. Keep the starter's `/sitemap-catalog.xml` pass-through and `/sitemap.xml` index; only add the site's own extra pages to the index.
 11. **Optimise every image before it goes into the site** (see `references/images.md`): `npx blanxer-storefront images`, AVIF + WebP, ×2 the largest display size, metadata stripped, `next/image` with width/height, `preload` only on each page's main (largest, first) image (Next.js 16 replaced `priority` with `preload`). **Product photos go into Blanxer through the MCP, never into the site.** No autoplay video backgrounds or GIF banners unless the merchant insists after hearing the speed cost. Fonts through `next/font`, at most 2 families.
 12. **The site's design lives in the site.** Don't use MCP page-builder or section tools (`blanxer_add_section`, `blanxer_update_section`, `blanxer_apply_page_template`, navigation/footer editors) to design a custom site; they change the Blanxer-hosted site. Exception: blog post bodies. `blanxer_create_blog_post` makes an empty post, and its body is written with `blanxer_add_section` / `blanxer_update_section` using `{ post_id }`. That is content the site shows, so use them for blog posts. **The design comes from the merchant's brief** (step 2): ask for reference sites first, and don't copy the Blanxer-hosted storefront unless they ask.
-13. **Confirm before bulk store changes.** Show the merchant the list (SEO for many products, imports, delivery charges) and get a yes. The MCP's own confirmations still apply.
+13. **Offers: prices come from the server's quote. Never compute a discount.** For stores on Blanxer's Offers plugin (`useOffers().enabled`, from `GET /public/promotions/:store_id`), every cart total, line saving, gift line, free delivery and code result comes from the quote (`useCartQuote()` / `quoteCart`, `POST /public/promotions/:store_id/quote`). Don't add up discounts, apply percentages, work out tier prices or decide whether a code applies in the site's code: show the quote's `totals`, `applications`, `lines` and the server's `messages` text. Lines with `added_by` (gifts the server added) are shown with "Free" and never sent back in a quote or an order. Orders carry `code`, `removed_offers` and `gift_choices` (the package does this). Stores not on Offers (`enabled: false`) keep the coupon flow; keep both paths. Use the package's offer components (`OfferBadges`, `OfferCardHint`, `ProductOffers`, `OffersList`, `OfferTopBar`, `OffersLink`; `CartView` and `Checkout` switch on their own) or build your own from `useOffers` / `useCartQuote`, and respect the store's offer display settings (`useOffers().display`). See `references/checkout.md`.
+14. **Confirm before bulk store changes.** Show the merchant the list (SEO for many products, imports, delivery charges) and get a yes. The MCP's own confirmations still apply.
 
 ## Steps (confirm each with the merchant before moving on)
 
@@ -46,6 +47,7 @@ The full docs are at https://developers.blanxer.com (agent index: https://develo
 - Read `https://api.blanxer.com/store/check_domain?domain=<subdomain>`. Show: store name, plan, product count (`/product/public/<_id>` length), and the payment methods the site will offer (rules in `references/checkout.md`).
   - Plan not in `basic / premium / plus / platinum` → "your site will take Cash on Delivery only".
   - `customer_program.enabled` → "shoppers check out as guests on the new site".
+  - `GET https://api.blanxer.com/public/promotions/<_id>`: `enabled: true` → the store is on **Offers**; list the live offers (title, code). `enabled: false` → discount codes are coupons. Either way the package handles the checkout; offers only change which components you place (badges, product-page blocks, an Offers page).
 - Run `blanxer_audit_seo` and look for catalog gaps (products without photos, prices, categories or SEO text). Show what's missing; fix later in step 4.
 
 ### 2. Design brief (ask, don't copy)
@@ -71,7 +73,8 @@ Show the merchant the starter running with their real products before changing t
 - Pages and design with the package's data functions (`@blanxer-dev/storefront/server`) and components (`@blanxer-dev/storefront/react`). Theme the checkout; don't rewrite it.
 - Page metadata from `@blanxer-dev/storefront/seo` (`productMetadata`, `categoryMetadata`, ...). SEO text is edited in Blanxer, not in the code.
 - Images: rule 11. Show a before/after size table, e.g. `hero.jpg 6.2 MB → hero.avif 180 KB`.
-- Store fixes through the MCP, confirmed first (rule 13): product and category SEO text, categories and brands the menus need, product photos the merchant sends, launch coupons, delivery places/charges. They reach the site through the API (allow ~60 s cache).
+- Offers stores: show the offers where the merchant wants them, with the package's components (`OfferBadges` on product cards, `ProductOffers` on the product page, `OfferTopBar`, an `/offers` page with `OffersList`). Prices in the cart and checkout come from the quote (rule 13).
+- Store fixes through the MCP, confirmed first (rule 14): product and category SEO text, categories and brands the menus need, product photos the merchant sends, launch offers or coupons (`references/mcp.md`), delivery places/charges. They reach the site through the API (allow ~60 s cache; offers are read live).
 
 ### 5. Check before deploy
 ```bash
@@ -82,7 +85,8 @@ It must pass: required routes, no secrets, no login code, browser-only order/pay
 
 ### 6. Test checkout
 On the local production build:
-- Fill the checkout with phone `0000000000`: the API answers success **without creating an order** and the checkout shows "Test order accepted". This proves the form, delivery charge, coupon and order request work. (Because no order exists, no gateway or QR screen opens on this path.)
+- Fill the checkout with phone `0000000000`: the API answers success **without creating an order** and the checkout shows "Test order accepted". This proves the form, delivery charge and order request work. (Because no order exists, no gateway or QR screen opens on this path. It also stops before a code is checked: read a code's result in the cart.)
+- Offers stores: the cart and checkout totals, line savings, gift lines ("Free") and the code's message are the quote's; changing the place updates delivery; the order request carries `code`, `removed_offers`, `gift_choices` and no gift lines.
 - Check every enabled payment method appears for a COD and a non-COD place as expected (rules in `references/checkout.md`).
 - Open `/payment/success`, `/payment/failed` and `/track/<any order id>` directly: they must render.
 - The gateway and QR screens themselves are checked once, live, in step 12.
@@ -121,12 +125,13 @@ Add the domain to the merchant's Cloudflare account and attach it to the Worker 
 ## When something goes wrong
 - 404 after paying → `/payment/success`, `/payment/failed` or `/track/[id]` is missing or renamed.
 - "Place not found" / COD refused → the delivery place must be one of the store's places exactly; COD only where that place allows it.
-- Coupon refused at order time → the order must carry the coupon's `_id`, not its code (the package does this).
+- Coupon ignored at order time (store not on Offers) → the order must carry the coupon's `_id`, not its code (the package does this).
+- Offers store: code refused at order time → HTTP 401 `{fields: {code}}` with the server's message (the same as the quote's `code.message`); show it under the code field. Price on the page differs from the order → the site computed it; show the quote. HTTP 429 from the quote → it is called too often or from the server (300 per 10 minutes per IP).
 - `403 error code: 1010` from the API on server-side fetches → make sure the package's fetch (with its User-Agent) is used; report it to Blanxer support.
 - More: https://developers.blanxer.com/api-docs/troubleshooting.md
 
 ## References
-- `references/checkout.md` — payment method rules, the three required pages, test numbers
+- `references/checkout.md` — payment method rules, offers and coupons, the three required pages, test numbers
 - `references/images.md` — image sizes, formats and the budget the check enforces
 - `references/deploy.md` — Cloudflare, worker size, custom domain, linking back to Blanxer
-- `references/mcp.md` — which MCP tool does what while building a site
+- `references/mcp.md` — which MCP tool does what while building a site, launch offers
