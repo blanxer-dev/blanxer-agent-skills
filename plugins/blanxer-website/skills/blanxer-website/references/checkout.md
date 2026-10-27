@@ -37,6 +37,17 @@ The starter has all three, built from `PaymentSuccess`, `PaymentFailed` and `Ord
 - The charge depends on the cart's total weight. The brackets are ≤1, ≤2, ≤3, ≤5, ≤10 and >10 kg. A place value of `-1` means the store default for that bracket.
 - The server recalculates everything, so a wrong number on the page can't be charged. It can still confuse the shopper, so keep the package's logic.
 
+## Store pickup
+
+Some stores (Platinum, several outlets) let shoppers collect the order at a store. `check_domain` then carries `store_pickup.outlets`. `Checkout` from `@blanxer-dev/storefront` **0.4.0 or later** handles it all:
+
+- the Home delivery / Pick up at store choice and the outlet list;
+- per-outlet stock, with another outlet recommended when the picked one is short;
+- no delivery charge;
+- "Pay at store" in place of Cash on Delivery, or online only / a part paid online first, as the store set it.
+
+Keep it; restyle it through the `bx-pickup*` classes. Never build a pickup choice yourself, and never offer it when `store_pickup` is missing or empty. Older package versions simply show delivery only. Test it with phone `0000000000` like any order.
+
 ## Offers (stores on the Offers plugin)
 
 Full spec: https://developers.blanxer.com/api-docs/checkout.md#offers
