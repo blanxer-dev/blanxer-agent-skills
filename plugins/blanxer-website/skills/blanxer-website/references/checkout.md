@@ -39,7 +39,7 @@ The starter has all three, built from `PaymentSuccess`, `PaymentFailed` and `Ord
 
 ## Store pickup
 
-Some stores (Platinum, several outlets) let shoppers collect the order at a store. `check_domain` then carries `store_pickup.outlets`. `Checkout` from `@blanxer-dev/storefront` **0.4.0 or later** handles it all:
+Some stores (Platinum with advanced inventory; one outlet is enough) let shoppers collect the order at a store. `check_domain` then carries `store_pickup.outlets`. `Checkout` from `@blanxer-dev/storefront` **0.4.0 or later** handles it all:
 
 - the Home delivery / Pick up at store choice and the outlet list;
 - per-outlet stock, with another outlet recommended when the picked one is short;
