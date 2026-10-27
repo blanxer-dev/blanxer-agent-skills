@@ -18,7 +18,7 @@ The merchant signs in to Blanxer in the browser. You never see a key.
 | Verify Google Search Console, add GA/GTM | `blanxer_set_site_verification` | store plugins → `verificationMetadata` (meta tags) and `<Pixel>` (GA, GTM, Clarity, Meta Pixel) |
 | Add products the merchant describes or sends photos of | `blanxer_create_product`, `blanxer_bulk_create_products`, `blanxer_bulk_import_products`, `blanxer_upload_product_image`, `blanxer_request_image_upload` | product endpoints |
 | Create categories and brands for the menus | `blanxer_create_category`, `blanxer_create_brand`, `blanxer_reorder_categories` | categories / brands |
-| Set up launch coupons | `blanxer_create_coupon` | coupons |
+| Set up launch offers and codes | Offers stores: `blanxer_create_offer` (below). Other stores: `blanxer_create_coupon` | `/public/promotions` (Offers) or coupons |
 | Fix delivery places, charges and COD | `blanxer_get_delivery_charges`, `blanxer_update_delivery_charges` | delivery table |
 | Change the store name or description (shared with the Blanxer site) | `blanxer_update_store_profile` | `check_domain.name`, `description` |
 | Change logo, favicon, brand name or colours (shared with the Blanxer site) | `blanxer_update_appearance` | `check_domain.customization` |
@@ -35,4 +35,26 @@ Don't use these to design a custom site, because they change the Blanxer-hosted 
 
 For the whole flow, `blanxer_how_to { operation: 'custom_website' }`.
 
-Confirm before bulk changes (rule 13).
+## Launch offers
+
+Discounts, codes, free delivery over an amount, buy more save more, buy X get Y, free gifts and bundles are **offers**, on stores with the **Offers** plugin.
+
+- `blanxer_get_store_context` says whether the store is on Offers (`offers.enabled`). Every plan can have it. The owner or a manager turns it on in the Blanxer dashboard (Offers in the menu); it can't be turned on through the MCP. Turning it on moves the store's coupons into Offers with the same codes and counts.
+- Not on Offers: a code is a coupon (`blanxer_create_coupon`, website checkout only). Everything else needs Offers.
+- On Offers: `blanxer_how_to { operation }` with `create_discount_code`, `create_automatic_offer`, `buy_more_save_more`, `buy_x_get_y`, `free_gift`, `bundle_offer` or `offer_performance` gives the exact call.
+
+| Tool | What |
+|---|---|
+| `blanxer_list_offers` | Offers with state, code and numbers. Check a code isn't taken first |
+| `blanxer_get_offer` | One offer's rules in plain words, codes and recent orders |
+| `blanxer_create_offer` | `amount_off`, `free_delivery`, `tiers`, `bxgy`, `bundle`, `gift`; automatic or with a `code` |
+| `blanxer_update_offer` | Only what changes (the tool merges it) |
+| `blanxer_set_offer_status` | Pause / resume; archive is preview-first and final |
+| `blanxer_quote_cart` | A manual or POS cart priced with the offers (not the website) |
+| `blanxer_get_offer_performance` | Orders, revenue, discount and gifts per offer |
+
+- Show the merchant the offer (what the shopper gets, products, dates, limits) and create it after their yes.
+- For the website, the offer's `channels` must include `web` (the default is all three) and `display.public` stays on for offers the site should list. New offers show on the site without a redeploy.
+- Check it in the site's cart: the totals come from the quote. Never compute a discount for the site (rule 13).
+
+Confirm before bulk changes (rule 14).

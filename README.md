@@ -26,7 +26,7 @@ Point the agent at https://developers.blanxer.com/llms.txt and add `https://mcp.
 plugins/blanxer-website/
   .claude-plugin/plugin.json
   .mcp.json                              Blanxer MCP (http, OAuth)
-  skills/blanxer-website/SKILL.md        the procedure + 13 hard rules
+  skills/blanxer-website/SKILL.md        the procedure + 14 hard rules
   skills/blanxer-website/references/     checkout, images, deploy, mcp
 ```
 
