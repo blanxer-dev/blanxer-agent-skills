@@ -48,7 +48,7 @@ The full docs are at https://developers.blanxer.com (agent index: https://develo
   - Plan not in `basic / premium / plus / platinum` → "your site will take Cash on Delivery only".
   - `customer_program.enabled` → "shoppers check out as guests on the new site".
   - `GET https://api.blanxer.com/public/promotions/<_id>`: `enabled: true` → the store is on **Offers**; list the live offers (title, code). `enabled: false` → discount codes are coupons. Either way the package handles the checkout; offers only change which components you place (badges, product-page blocks, an Offers page).
-  - `online_fulfilment.pooled` true → the store **sells from several shops** (switched on by Blanxer support): checkout is priced by the server's checkout plan and an order can arrive in several parcels. The package handles it from the release after 0.4.0; see `references/checkout.md`. Missing or false (almost every store) → nothing changes; don't mention it.
+  - `online_fulfilment.pooled` true → the store **sells from several shops** (switched on by Blanxer support): checkout is priced by the server's checkout plan and an order can arrive in several parcels. `@blanxer-dev/storefront` **0.5.0 or later** handles it; see `references/checkout.md`. Missing or false (almost every store) → nothing changes; don't mention it.
 - Run `blanxer_audit_seo` and look for catalog gaps (products without photos, prices, categories or SEO text). Show what's missing; fix later in step 4.
 
 ### 2. Design brief (ask, don't copy)

@@ -52,7 +52,7 @@ Keep it; restyle it through the `bx-pickup*` classes. Never build a pickup choic
 
 A few stores sell online from several of their shops. Blanxer support switches it on per store (Platinum, advanced inventory, at least two shops that can ship). `check_domain` then has `online_fulfilment { pooled, display_stock, show_stores, checkout_plan }`. **When it is missing or `pooled` is false, nothing below applies: don't change a site whose store isn't pooled.** Full spec: https://developers.blanxer.com/api-docs/pooled-stock.md
 
-What changes on a pooled store, and what the package (the release after 0.4.0) does by itself:
+What changes on a pooled store, and what `Checkout` from `@blanxer-dev/storefront` **0.5.0 or later** does by itself:
 
 - **Stock:** the same `quantity` fields, but the number can be the shops' total. Show it the way the site already does. With `show_stores`, the product page can say "Available at Pokhara, Butwal" (`GET /order/public/store-availability/<store_id>/<product_id>`, bands `in_stock` / `few`, never counts).
 - **Delivery comes from the server's checkout plan.** With `checkout_plan: true`, each shop can have its own delivery charge, so **never compute delivery from the delivery table**. `POST /order/public/checkout-plan` returns the parcels (the shop each ships from, its lines, its delivery, its share of the discount and advance), `totals`, `delivery_label` ("Delivery: Pokhara Rs 150 · Butwal free"), the checkout's `advance` and `payable.total`. It holds nothing; 120 per 10 minutes per IP, browser only. Stores that aren't pooled keep the delivery-table calculation.
@@ -64,7 +64,7 @@ What you must keep:
 
 - **The payment grid stays as it is.** Parcels, "Arrives in 2 parcels" and the delivery line go in the order summary, a payment tile's subtitle or the place-order button, never in a second grid of choices.
 - Update the package before Blanxer support switches the store to pooled: an older checkout shows the delivery table's charge while the server charges per shop.
-- Restyle through the `bx-plan-*`, `bx-checkout-parcels` and `bx-store-availability` classes. Test with phone `0000000000` like any order; the parcels and delivery show in the checkout before you place it.
+- Restyle through the `bx-plan-*`, `bx-checkout-parcels`, `bx-store-availability` and `bx-cancel-scope` classes; "Available at" is `AddToCart`'s `showStores`. Test with phone `0000000000` like any order; the parcels and delivery show in the checkout before you place it.
 
 ## Offers (stores on the Offers plugin)
 
