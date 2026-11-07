@@ -48,6 +48,7 @@ The full docs are at https://developers.blanxer.com (agent index: https://develo
   - Plan not in `basic / premium / plus / platinum` → "your site will take Cash on Delivery only".
   - `customer_program.enabled` → "shoppers check out as guests on the new site".
   - `GET https://api.blanxer.com/public/promotions/<_id>`: `enabled: true` → the store is on **Offers**; list the live offers (title, code). `enabled: false` → discount codes are coupons. Either way the package handles the checkout; offers only change which components you place (badges, product-page blocks, an Offers page).
+  - `online_fulfilment.pooled` true → the store **sells from several shops** (switched on by Blanxer support): checkout is priced by the server's checkout plan and an order can arrive in several parcels. `@blanxer-dev/storefront` **0.5.0 or later** handles it; see `references/checkout.md`. Missing or false (almost every store) → nothing changes; don't mention it.
 - Run `blanxer_audit_seo` and look for catalog gaps (products without photos, prices, categories or SEO text). Show what's missing; fix later in step 4.
 
 ### 2. Design brief (ask, don't copy)
@@ -73,6 +74,7 @@ Show the merchant the starter running with their real products before changing t
 - Pages and design with the package's data functions (`@blanxer-dev/storefront/server`) and components (`@blanxer-dev/storefront/react`). Theme the checkout; don't rewrite it.
 - Page metadata from `@blanxer-dev/storefront/seo` (`productMetadata`, `categoryMetadata`, ...). SEO text is edited in Blanxer, not in the code.
 - Images: rule 11. Show a before/after size table, e.g. `hero.jpg 6.2 MB → hero.avif 180 KB`.
+- Pooled stores (`online_fulfilment.checkout_plan`): never compute delivery from the delivery table; the checkout plan gives the parcels, delivery and total. Parcels and the delivery line go in the order summary, a tile subtitle or the button, never a second grid. Optional "Available at Pokhara, Butwal" on product pages when `show_stores` is on (`references/checkout.md`).
 - Offers stores: show the offers where the merchant wants them, with the package's components (`OfferBadges` on product cards, `ProductOffers` on the product page, `OfferTopBar`, an `/offers` page with `OffersList`). Prices in the cart and checkout come from the quote (rule 13).
 - Store fixes through the MCP, confirmed first (rule 14): product and category SEO text, categories and brands the menus need, product photos the merchant sends, launch offers or coupons (`references/mcp.md`), delivery places/charges. They reach the site through the API (allow ~60 s cache; offers are read live).
 
@@ -88,6 +90,7 @@ On the local production build:
 - Fill the checkout with phone `0000000000`: the API answers success **without creating an order** and the checkout shows "Test order accepted". This proves the form, delivery charge and order request work. (Because no order exists, no gateway or QR screen opens on this path. It also stops before a code is checked: read a code's result in the cart.)
 - Offers stores: the cart and checkout totals, line savings, gift lines ("Free") and the code's message are the quote's; changing the place updates delivery; the order request carries `code`, `removed_offers`, `gift_choices` and no gift lines.
 - Check every enabled payment method appears for a COD and a non-COD place as expected (rules in `references/checkout.md`).
+- Pooled stores: the checkout shows the parcels ("Arrives in 2 parcels"), the delivery line from the plan and the plan's total, for a place where the cart splits and one where it doesn't; the order request carries `checkout_plan_id`.
 - Open `/payment/success`, `/payment/failed` and `/track/<any order id>` directly: they must render.
 - The gateway and QR screens themselves are checked once, live, in step 12.
 
@@ -127,11 +130,12 @@ Add the domain to the merchant's Cloudflare account and attach it to the Worker 
 - "Place not found" / COD refused → the delivery place must be one of the store's places exactly; COD only where that place allows it.
 - Coupon ignored at order time (store not on Offers) → the order must carry the coupon's `_id`, not its code (the package does this).
 - Offers store: code refused at order time → HTTP 401 `{fields: {code}}` with the server's message (the same as the quote's `code.message`); show it under the code field. Price on the page differs from the order → the site computed it; show the quote. HTTP 429 from the quote → it is called too often or from the server (300 per 10 minutes per IP).
+- Pooled store: delivery on the page differs from the order, or HTTP 409 `CHECKOUT_PLAN_STALE` → the site must price checkout with the checkout plan and send its `plan_id`; on a 409 show the fresh `plan` and let the shopper place again (the package does this; update it).
 - `403 error code: 1010` from the API on server-side fetches → make sure the package's fetch (with its User-Agent) is used; report it to Blanxer support.
 - More: https://developers.blanxer.com/api-docs/troubleshooting.md
 
 ## References
-- `references/checkout.md` — payment method rules, offers and coupons, the three required pages, test numbers
+- `references/checkout.md` — payment method rules, store pickup, selling from several stores (pooled), offers and coupons, the three required pages, test numbers
 - `references/images.md` — image sizes, formats and the budget the check enforces
 - `references/deploy.md` — Cloudflare, worker size, custom domain, linking back to Blanxer
-- `references/mcp.md` — which MCP tool does what while building a site, launch offers
+- `references/mcp.md` — which MCP tool does what while building a site, launch offers, pooled stores (shops, delivery per shop, split orders)
