@@ -111,7 +111,7 @@ Some stores sell online from several of their shops: the website's stock is the 
 - `allowed: false` → tell the merchant Blanxer support switches it on.
 - `blockers` say why it can't be switched on yet, and `warnings` what to fix (for example a shop with no Tigg location). Show them as they are.
 
-**Shops** (owner / manager):
+**Shops** (owner / manager). Every `outlet` / `copy_from` / `apply_to` value is a shop's name (as in `blanxer_list_outlets`) or its id.
 
 | Tool | What |
 |---|---|
@@ -124,7 +124,7 @@ Some stores sell online from several of their shops: the website's stock is the 
 - `blanxer_update_delivery_charges { outlet, mode, adjust, defaults, place_updates, reset_places, copy_from, apply_to }`:
   - `mode` / `adjust` as on the outlet: `{ outlet, mode: 'store_plus', adjust: { basis: 'amount', value: 50 } }` = the store's rates + Rs 50 from that shop;
   - `own` rates are changes on top of the store's: `defaults` and `place_updates` set cells, `reset_places` puts cities back to the store's. Cities the shop never changed keep following the store;
-  - `copy_from: 'store' | <outlet>` starts this shop from the store's or another shop's setup; `apply_to: [<outlets>]` copies this shop's setup to others in one go;
+  - `copy_from: 'store' | <outlet>` with `outlet` starts this shop from the store's or another shop's setup; `apply_to: [<outlets>]` (or `['all']`) copies this shop's setup — or `copy_from`'s — to others in one go;
   - always **preview → the merchant's yes → apply with the `confirm_token`**. The answer has an `undo_token` to put it back. The preview says when it would replace a shop's own changes.
 
 **Orders** (manual orders and the order list):
