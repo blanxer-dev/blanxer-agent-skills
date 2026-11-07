@@ -23,7 +23,7 @@ The merchant signs in to Blanxer in the browser. You never see a key.
 | Add products the merchant describes or sends photos of | `blanxer_create_product`, `blanxer_bulk_create_products`, `blanxer_bulk_import_products`, `blanxer_upload_product_image`, `blanxer_request_image_upload` | product endpoints |
 | Create categories and brands for the menus | `blanxer_create_category`, `blanxer_create_brand`, `blanxer_reorder_categories` | categories / brands |
 | Set up launch offers and codes | Offers stores: `blanxer_create_offer` (below). Other stores: `blanxer_create_coupon` | `/public/promotions` (Offers) or coupons |
-| Fix delivery places, charges and COD | `blanxer_get_delivery_charges`, `blanxer_update_delivery_charges` | delivery table |
+| Fix delivery places, charges and COD | `blanxer_get_delivery_charges`, `blanxer_update_delivery_charges` (pooled stores: per shop too, see [Selling from several stores](#selling-from-several-stores-pooled-stock)) | delivery table (pooled stores: the checkout plan) |
 | Change the store name or description (shared with the Blanxer site) | `blanxer_update_store_profile` | `check_domain.name`, `description` |
 | Change logo, favicon, brand name or colours (shared with the Blanxer site) | `blanxer_update_appearance` | `check_domain.customization` |
 | Write blog posts | `blanxer_create_blog_post` (empty post), then its body with `blanxer_add_section` / `blanxer_update_section` using `{ post_id }`, then `blanxer_set_blog_post_status` | blog |
@@ -97,3 +97,41 @@ Discounts, codes, free delivery over an amount, buy more save more, buy X get Y,
 - Check it in the site's cart: the totals come from the quote. Never compute a discount for the site (rule 13).
 
 Confirm before bulk changes (rule 14).
+
+## Selling from several stores (pooled stock)
+
+Some stores sell online from several of their shops: the website's stock is the shops' total, the server picks which shop sends each order, and a cart no single shop can fill becomes one checkout with several orders. It is opt-in. **On every other store none of this applies and nothing changes**, so don't bring it up unless the store has it or the merchant asks.
+
+- **Who switches it on:** Blanxer support allows it per store (Platinum, advanced inventory, at least two shops that can ship). Then the owner switches it on, picks the pool shops, the routing per city and the website display in the dashboard: **Setting → Checkout → Store pickup & fulfilment**. Those are dashboard-only; the MCP can't change them.
+- **The site's code doesn't change** for it: the package's checkout reads `online_fulfilment` and uses the server's checkout plan (`references/checkout.md`).
+- `blanxer_how_to { operation }` with `set_up_pooled_stock`, `location_delivery_charges` or `split_orders` gives the exact steps for this store.
+
+**Is it on?** `blanxer_get_store_context` → `online_fulfilment { pooled, allowed, eligible, blockers[], warnings[], pool_outlets, display }`.
+
+- `allowed: false` → tell the merchant Blanxer support switches it on.
+- `blockers` say why it can't be switched on yet, and `warnings` what to fix (for example a shop with no Tigg location). Show them as they are.
+
+**Shops** (owner / manager):
+
+| Tool | What |
+|---|---|
+| `blanxer_list_outlets` | Each shop with its city, online buffer, delivery label and pool status |
+| `blanxer_update_outlet { outlet, city, online_buffer, courier_bindings, delivery_mode, delivery_adjust }` | Only what changes. `city` must be one of the store's delivery places (routing uses it). `online_buffer` = units always kept for walk-in customers, never sold online. `courier_bindings` = which courier pickup the shop ships with. `delivery_mode` `store` (the store's rates), `store_plus` (the store's rates + `delivery_adjust { basis: 'amount' \| 'percent', value }`, e.g. +Rs 50 or +20%), `own` (its own rates) or `free` |
+
+**Delivery charge per shop.** A checkout pays one charge for each shop its items come from, each at that shop's rates. Cash on delivery per place stays store-wide.
+
+- `blanxer_get_delivery_charges { outlet }` → that shop's effective rates; `outlet: 'all'` → every shop's label ("Same as store", "Store +Rs 50", "Own rates · 12 cities changed", "Free").
+- `blanxer_update_delivery_charges { outlet, mode, adjust, defaults, place_updates, reset_places, copy_from, apply_to }`:
+  - `mode` / `adjust` as on the outlet: `{ outlet, mode: 'store_plus', adjust: { basis: 'amount', value: 50 } }` = the store's rates + Rs 50 from that shop;
+  - `own` rates are changes on top of the store's: `defaults` and `place_updates` set cells, `reset_places` puts cities back to the store's. Cities the shop never changed keep following the store;
+  - `copy_from: 'store' | <outlet>` starts this shop from the store's or another shop's setup; `apply_to: [<outlets>]` copies this shop's setup to others in one go;
+  - always **preview → the merchant's yes → apply with the `confirm_token`**. The answer has an `undo_token` to put it back. The preview says when it would replace a shop's own changes.
+
+**Orders** (manual orders and the order list):
+
+- `blanxer_quote_cart` on a pooled store returns `parcels[]` (the shop each ships from, its lines and delivery) and a `checkout_plan_id`. Show the merchant the parcels and the total.
+- `blanxer_create_order { …, checkout_plan_id }` charges what that quote said; it returns `orders[]` when the cart split. `outlet` forces one shop (it fails when that shop is short).
+- `blanxer_list_orders { split, checkout_group, outlet, to_pack }`: split checkouts, one checkout's orders, one shop's orders, what a shop still has to pack. `blanxer_get_order` → `checkout_group` ("Parcel 1 of 2") and `linked_orders`.
+- `blanxer_update_order_status { group_scope: 'order' | 'group' }`: cancel only this parcel, or every parcel of the checkout that isn't sent yet. Ask the merchant which; the default is one.
+
+**Between locations:** `blanxer_get_between_locations { period | from/to, location?, received_by?, view?: 'between' | 'shipped_for_online' }`. A read-only record of which shop sent goods for orders paid somewhere else (online or at another shop): units, selling value, cost, delivery, courier fees, by shop and as a "received by × sent by" grid. `shipped_for_online` = what each shop sent for online orders. There is no settle status and Blanxer posts nothing; the merchant settles it their own way. Only pooled stores have the between-locations record.
