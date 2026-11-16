@@ -41,7 +41,7 @@ For the whole flow, `blanxer_how_to { operation: 'custom_website' }`.
 
 ## Search engines (the SEO plugin)
 
-Newer Blanxer has an **SEO plugin** (free on every plan; BlanxerAI work uses the store's BlanxerAI allowance). On an older Blanxer these tools answer "needs the next backend release" and `blanxer_audit_seo` runs its older checks. `blanxer_how_to { operation: 'improve_seo' }` gives the whole recipe.
+Newer Blanxer has an **SEO plugin** (free on every website plan; BlanxerAI work uses the store's BlanxerAI allowance). On an older Blanxer these tools answer "needs the next backend release" and `blanxer_audit_seo` runs its older checks. `blanxer_how_to { operation: 'improve_seo' }` gives the whole recipe.
 
 **Audit.** `blanxer_audit_seo` returns a 0–100 score, parts (products, categories, brands, pages, blog, site), issues by severity (high first) with a count, examples and the fix, and a 30-day score history. Each fix names its tool: a BlanxerAI job, `blanxer_fix_slugs`, an SEO setting, or a dashboard link. Passing `scope` runs the older local checks instead.
 

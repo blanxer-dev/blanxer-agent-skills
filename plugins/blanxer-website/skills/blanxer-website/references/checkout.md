@@ -6,7 +6,7 @@ Use `Checkout` from `@blanxer-dev/storefront/react` on `/checkout`. It reproduce
 
 Cash on Delivery: always offered, but only for delivery places where the store allows COD (place flag `true` or `'Y'`).
 
-Online methods: only when the store's `plan` is `basic`, `premium`, `plus` or `platinum`, and only those the store has turned on:
+Online methods: only when `check_domain` says `plan_info.features.online_payments` (no `plan_info` on an older Blanxer: when the store's `plan` is `basic`, `premium`, `plus`, `platinum` or `elite`), and only those the store has turned on. Free stores and the POS plan are Cash on Delivery only:
 
 | Method (`paymentMethod`) | Shown when |
 |---|---|
@@ -39,7 +39,7 @@ The starter has all three, built from `PaymentSuccess`, `PaymentFailed` and `Ord
 
 ## Store pickup
 
-Some stores (Platinum with advanced inventory; one outlet is enough) let shoppers collect the order at a store. `check_domain` then carries `store_pickup.outlets`. `Checkout` from `@blanxer-dev/storefront` **0.4.0 or later** handles it all:
+Some stores (Business Plus, Platinum or Elite with advanced inventory; one outlet is enough) let shoppers collect the order at a store. `check_domain` then carries `store_pickup.outlets`. `Checkout` from `@blanxer-dev/storefront` **0.4.0 or later** handles it all:
 
 - the Home delivery / Pick up at store choice and the outlet list;
 - per-outlet stock, with another outlet recommended when the picked one is short;
