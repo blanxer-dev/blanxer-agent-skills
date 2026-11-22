@@ -6,7 +6,7 @@ Use `Checkout` from `@blanxer-dev/storefront/react` on `/checkout`. It reproduce
 
 Cash on Delivery: always offered, but only for delivery places where the store allows COD (place flag `true` or `'Y'`).
 
-Online methods: only when `check_domain` says `plan_info.features.online_payments` (no `plan_info` on an older Blanxer: when the store's `plan` is `basic`, `premium`, `plus`, `platinum` or `elite`), and only those the store has turned on. Free stores and the POS plan are Cash on Delivery only:
+Online methods: only when `check_domain` says `plan_info.features.online_payments` (no `plan_info` on an older Blanxer: when the store's `plan` is `basic`, `premium`, `plus`, `platinum`, `elite` or `enterprise`), and only those the store has turned on. Free stores and the POS plan are Cash on Delivery only:
 
 | Method (`paymentMethod`) | Shown when |
 |---|---|
